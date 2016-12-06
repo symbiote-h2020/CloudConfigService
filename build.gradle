@@ -14,8 +14,8 @@ apply plugin: 'java'
 apply plugin: 'spring-boot'
 
 jar {
-    baseName = 'cloudConfig-service'
-    version = '0.0.1-SNAPSHOT'
+    baseName = 'CloudConfigService'
+    version = '0.0.1'
 }
 
 repositories {
