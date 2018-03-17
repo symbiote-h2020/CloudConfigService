@@ -7,15 +7,21 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath group: 'com.cinnober.gradle', name: 'semver-git', version: '2.2.1'
     }
 }
 
 apply plugin: 'java'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'com.cinnober.gradle.semver-git'
+apply plugin: 'maven-publish'
+
+project.group = 'eu.h2020.symbiote'
+project.version = '1.2.0-SNAPSHOT'
 
 jar {
     baseName = 'CloudConfigService'
-    version = '1.2.0'
+    version = project.version
 }
 
 repositories {
@@ -33,3 +39,44 @@ dependencyManagement {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.SR5"
     }
 }
+
+bootRepackage {
+   classifier = 'run'
+}
+
+task generateJavaDocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+    destinationDir = reporting.file("javadocs")
+}
+
+task javadocJar(type: Jar, dependsOn: generateJavaDocs) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = project.group
+            version = project.version
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar
+
+            artifact(file("$libsDir/$project.name-$project.version-${bootRepackage.classifier}.jar")) {
+                classifier "run"
+            }
+       }
+   }
+}
+
+publishToMavenLocal.dependsOn(bootRepackage)
+
