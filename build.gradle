@@ -17,7 +17,7 @@ apply plugin: 'com.cinnober.gradle.semver-git'
 apply plugin: 'maven-publish'
 
 project.group = 'eu.h2020.symbiote'
-project.version = '1.2.0-SNAPSHOT'
+
 
 jar {
     baseName = 'CloudConfigService'
